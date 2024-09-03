@@ -1,5 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function LoginPage() {
   // State to manage form inputs
@@ -67,9 +68,9 @@ export default function LoginPage() {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Don't have an account?
-            <a href="#" className="text-blue-600 hover:underline">
+            <Link to="/signup" className="text-blue-600 hover:underline">
               Sign Up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
