@@ -32,8 +32,30 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await UserModel.findOne({
-      $or: [{ username: username }, { password: password }],
+      $or: [{ username: username }, { email: username }],
     });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid username or email" });
+    }
+
+    const comparePasswords = await bcrypt.compare(password, user.password);
+    if (!comparePasswords) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
+
+    const payload = {
+      userId: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+    };
+    const token = jwt.sign(payload, JWT_SECRET_KEY);
+
+    res
+      .status(201)
+      .json({ success: true, message: "User logged in successfully!", token });
   } catch (error) {}
 });
 
