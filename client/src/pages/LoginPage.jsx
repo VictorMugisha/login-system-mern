@@ -1,6 +1,6 @@
 /* eslint-disable react/no-unescaped-entities */
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 export default function LoginPage() {
   // State to manage form inputs
@@ -8,6 +8,12 @@ export default function LoginPage() {
     email: "",
     password: "",
   });
+
+  const [errors, setErrors] = useState({
+    noAuth: null,
+  });
+
+  const location = useLocation();
 
   // Handle input change
   const handleChange = (e) => {
@@ -25,12 +31,24 @@ export default function LoginPage() {
     // Add your form submission logic here
   };
 
+  useEffect(() => {
+    if (location.state) {
+      setErrors((currentErrors) => {
+        return {
+          ...currentErrors,
+          noAuth: location.state.message,
+        };
+      });
+    }
+  }, [location.state])
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Login to MyApp
         </h2>
+        {errors.noAuth && <div>{errors.noAuth}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -70,6 +88,15 @@ export default function LoginPage() {
             Don't have an account?
             <Link to="/signup" className="text-blue-600 hover:underline">
               Sign Up
+            </Link>
+          </p>
+        </div>
+
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            <span className="pr-1">Go back to</span>
+            <Link to="/" className="text-blue-600 hover:underline">
+              Homepage
             </Link>
           </p>
         </div>

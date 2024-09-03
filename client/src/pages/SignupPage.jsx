@@ -114,6 +114,15 @@ export default function SignupPage() {
             </Link>
           </p>
         </div>
+        
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
+            <span className="pr-1">Go back to</span>
+            <Link to="/" className="text-blue-600 hover:underline">
+              Homepage
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

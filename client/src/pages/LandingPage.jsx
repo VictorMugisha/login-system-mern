@@ -1,4 +1,6 @@
-const HomePage = () => {
+import { Link } from "react-router-dom";
+
+export default function LandngPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
@@ -6,12 +8,12 @@ const HomePage = () => {
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-3xl font-bold text-blue-600">MyApp</h1>
           <div className="space-x-4">
-            <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            <Link to="/login" className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
               Login
-            </button>
-            <button className="px-6 py-2 bg-gray-200 text-blue-600 rounded hover:bg-gray-300">
+            </Link>
+            <Link to="/signup" className="px-6 py-2 bg-gray-200 text-blue-600 rounded hover:bg-gray-300">
               Sign Up
-            </button>
+            </Link>
           </div>
         </div>
       </header>
@@ -109,6 +111,4 @@ const HomePage = () => {
       </footer>
     </div>
   );
-};
-
-export default HomePage;
+}
