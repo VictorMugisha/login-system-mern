@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const bcrypt = require("bcrypt");
-const core = require("cors");
+const cors = require("cors");
 const UserModel = require("./model/userModel.js");
 
 dotenv.config();
@@ -33,9 +33,9 @@ app.post("/register", async (req, res) => {
         .json({ message: "Password must be at least 6 characters long" });
     }
 
-    const existingUser = await UserModel.findOne($or[{ email }], [
-      { username },
-    ]);
+    const existingUser = await UserModel.findOne({
+      $or: [{ email }, { username }],
+    });
     if (existingUser) {
       return res
         .status(400)
