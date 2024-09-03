@@ -1,19 +1,75 @@
-const SignupPage = () => {
+import { useState } from "react";
+
+export default function SignupPage() {
+  // State to manage form inputs
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  // Handle form submission (dummy logic)
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Signup form submitted:", formData);
+    // Add your form submission logic here
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Sign Up for MyApp
         </h2>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Name
+              First Name
             </label>
             <input
               type="text"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-              placeholder="Enter your name"
+              placeholder="Enter your first name"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Last Name
+            </label>
+            <input
+              type="text"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              placeholder="Enter your last name"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              placeholder="Enter your username"
             />
           </div>
           <div className="mb-4">
@@ -22,6 +78,9 @@ const SignupPage = () => {
             </label>
             <input
               type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="Enter your email"
             />
@@ -32,6 +91,9 @@ const SignupPage = () => {
             </label>
             <input
               type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="Enter your password"
             />
@@ -54,6 +116,4 @@ const SignupPage = () => {
       </div>
     </div>
   );
-};
-
-export default SignupPage;
+}
