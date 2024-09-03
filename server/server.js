@@ -21,6 +21,7 @@ mongoose
 
 // ROUTE HANDLERS
 
+// Register route handler
 app.post("/register", registerUser);
 
 // Login route handler
