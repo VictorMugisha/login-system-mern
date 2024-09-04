@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/useAuthContext";
+import { BASE_API } from "../config";
 
 export default function SignupPage() {
   // State to manage form inputs
@@ -44,13 +45,10 @@ export default function SignupPage() {
       }));
       return;
     }
-    console.log("Signup form submitted:", formData);
-    // Add your form submission logic here
 
     try {
       setLoading(true);
-      const API = "http://localhost:5000/register";
-      const res = await fetch(API, {
+      const res = await fetch(`${BASE_API}/register`, {
         method: "POST",
         body: JSON.stringify(formData),
         headers: { "Content-Type": "application/json" },

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/useAuthContext";
+import { BASE_API } from "../config";
 
 export default function LoginPage() {
   const { login, loginAuth } = useAuthContext();
@@ -66,10 +67,9 @@ export default function LoginPage() {
       return;
     }
 
-    const API = "http://localhost:5000/login";
     setLoading(true);
     try {
-      const res = await fetch(API, {
+      const res = await fetch(`${BASE_API}/login`, {
         method: "POST",
         body: JSON.stringify(formData),
         headers: {
