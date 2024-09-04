@@ -1,15 +1,36 @@
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { BASE_API } from "../../config";
+import { useAuthContext } from "../../contexts/useAuthContext";
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
+  const { token } = useAuthContext();
 
   // Dummy fetch logic to simulate getting users from a database
   useEffect(() => {
     // Replace this with your actual fetch logic to get users from your backend
     const fetchUsers = async () => {
       // Simulated user data, replace with actual API call
+      try {
+        const response = await fetch(`${BASE_API}/users`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch users");
+        }
+
+        const data = await response.json();
+        console.log(data);
+      } catch (error) {
+        console.error(error);
+      }
       const data = [
         {
           id: 1,
@@ -31,7 +52,7 @@ export default function UsersPage() {
     };
 
     fetchUsers();
-  }, []);
+  }, [token]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">

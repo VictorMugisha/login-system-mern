@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 
 const UserModel = require("./model/userModel.js");
 
@@ -29,16 +30,48 @@ app.post("/register", registerUser);
 // Login route handler
 app.post("/login", loginUser);
 
-
 // Get list of all users
-app.get("/users", async (req, res) => {
+app.get("/users", verifyToken, async (req, res) => {
   try {
     const users = await UserModel.find();
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-})
+});
+
+// Middleware function to verify JWT token
+function verifyToken(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res
+        .status(401)
+        .json({ message: "Authorization header is missing!" });
+    }
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "Token is missing!" });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+      if (err) {
+        if (err.name === "TokenExpiredError") {
+          return res.status(401).json({ message: "Token has expired!" });
+        }
+        if (err.name === "JsonWebTokenError") {
+          return res.status(401).json({ message: "Invalid token!" });
+        }
+        return res.status(401).json({ message: "Unauthorized!" });
+      }
+      req.user = decoded;
+      next();
+    });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
