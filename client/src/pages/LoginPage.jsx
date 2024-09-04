@@ -4,6 +4,9 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/useAuthContext";
 
 export default function LoginPage() {
+  const { login, loginAuth } = useAuthContext();
+  const navigate = useNavigate();
+
   // State to manage form inputs
   const [formData, setFormData] = useState({
     username: "",
@@ -11,9 +14,6 @@ export default function LoginPage() {
   });
 
   const [loading, setLoading] = useState(false);
-
-  const { login } = useAuthContext();
-  const navigate = useNavigate();
 
   const defaultErrors = {
     noAuth: null,
@@ -119,6 +119,12 @@ export default function LoginPage() {
       });
     }
   }, [location.state]);
+
+  useEffect(() => {
+    if (loginAuth) {
+      navigate("/auth/home");
+    }
+  }, [loginAuth, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

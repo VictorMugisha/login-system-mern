@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../contexts/useAuthContext";
 
 export default function SignupPage() {
   // State to manage form inputs
@@ -10,6 +11,9 @@ export default function SignupPage() {
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
+  const { loginAuth } = useAuthContext();
 
   // Handle input change
   const handleChange = (e) => {
@@ -26,6 +30,12 @@ export default function SignupPage() {
     console.log("Signup form submitted:", formData);
     // Add your form submission logic here
   };
+
+  useEffect(() => {
+    if (loginAuth) {
+      navigate("/auth/home");
+    }
+  }, [loginAuth, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -114,7 +124,7 @@ export default function SignupPage() {
             </Link>
           </p>
         </div>
-        
+
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             <span className="pr-1">Go back to</span>

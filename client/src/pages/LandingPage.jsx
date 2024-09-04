@@ -1,6 +1,18 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../contexts/useAuthContext";
 
 export default function LandngPage() {
+  const navigate = useNavigate();
+  const { loginAuth } = useAuthContext();
+  
+  useEffect(() => {
+    if (loginAuth) {
+      navigate("/auth/home");
+    }
+  }, [loginAuth, navigate]);
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Header */}
@@ -8,10 +20,16 @@ export default function LandngPage() {
         <div className="container mx-auto flex justify-between items-center">
           <h1 className="text-3xl font-bold text-blue-600">MyApp</h1>
           <div className="space-x-4">
-            <Link to="/login" className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            <Link
+              to="/login"
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
               Login
             </Link>
-            <Link to="/signup" className="px-6 py-2 bg-gray-200 text-blue-600 rounded hover:bg-gray-300">
+            <Link
+              to="/signup"
+              className="px-6 py-2 bg-gray-200 text-blue-600 rounded hover:bg-gray-300"
+            >
               Sign Up
             </Link>
           </div>
