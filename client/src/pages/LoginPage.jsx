@@ -1,17 +1,29 @@
 /* eslint-disable react/no-unescaped-entities */
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../contexts/useAuthContext";
 
 export default function LoginPage() {
   // State to manage form inputs
   const [formData, setFormData] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
-  const [errors, setErrors] = useState({
+  const [loading, setLoading] = useState(false);
+
+  const { login } = useAuthContext();
+  const navigate = useNavigate();
+
+  const defaultErrors = {
     noAuth: null,
-  });
+    shortPassword: null,
+    incorrectPassword: null,
+    invalidUsername: null,
+    serverError: null,
+    randomError: null,
+  };
+  const [errors, setErrors] = useState(defaultErrors);
 
   const location = useLocation();
 
@@ -24,11 +36,77 @@ export default function LoginPage() {
     }));
   };
 
-  // Handle form submission (dummy logic)
-  const handleSubmit = (e) => {
+  function handleErrors(status, data) {
+    switch (status) {
+      case 400:
+        return { invalidUsername: data.message };
+      case 401:
+        return { incorrectPassword: data.message };
+      case 500:
+        return { serverError: data.message };
+      default:
+        return {
+          randomError: "An unexpected error occurred. Please try again.",
+        };
+    }
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login form submitted:", formData);
-    // Add your form submission logic here
+    setErrors(defaultErrors);
+
+    // Basic Password Validation
+    if (formData.password.length < 6) {
+      setErrors((currentErrors) => {
+        return {
+          ...currentErrors,
+          shortPassword: "Password must be atleast 6 characters!",
+        };
+      });
+      return;
+    }
+
+    const API = "http://localhost:5000/login";
+    setLoading(true);
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const { status } = res;
+      const data = await res.json();
+      if (status !== 201) {
+        const errorMessages = handleErrors(res.status, data);
+        if (Object.keys(errorMessages).length > 0) {
+          setErrors((currentErrors) => ({
+            ...currentErrors,
+            ...errorMessages,
+          }));
+          return;
+        }
+      }
+
+      // Success Codes
+      login(data.token);
+      navigate("/auth/home", {
+        state: { message: "Login Successful" },
+        replace: true,
+      });
+    } catch (error) {
+      console.log(error);
+      setErrors((currentErrors) => {
+        return {
+          ...currentErrors,
+          randomError: error.message,
+        };
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -40,7 +118,7 @@ export default function LoginPage() {
         };
       });
     }
-  }, [location.state])
+  }, [location.state]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -48,19 +126,58 @@ export default function LoginPage() {
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Login to MyApp
         </h2>
-        {errors.noAuth && <div>{errors.noAuth}</div>}
+        {errors.noAuth && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.noAuth}
+          </div>
+        )}
+        {errors.shortPassword && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.shortPassword}
+          </div>
+        )}
+        {errors.serverError && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.serverError}
+          </div>
+        )}
+        {errors.incorrectPassword && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.incorrectPassword}
+          </div>
+        )}
+        {errors.invalidUsername && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.invalidUsername}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Email
+              Username or Email
             </label>
             <input
-              type="email"
-              name="email"
-              value={formData.email}
+              type="text"
+              name="username"
+              value={formData.username}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-              placeholder="Enter your email"
+              placeholder="Username or Email"
             />
           </div>
           <div className="mb-6">
@@ -76,12 +193,23 @@ export default function LoginPage() {
               placeholder="Enter your password"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-          >
-            Login
-          </button>
+
+          {loading ? (
+            <button
+              type="submit"
+              disabled={true}
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Processing...
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Login
+            </button>
+          )}
         </form>
         <div className="mt-6 text-center">
           <p className="text-gray-600">
