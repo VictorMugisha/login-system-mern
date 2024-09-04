@@ -10,7 +10,16 @@ export default function SignupPage() {
     username: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+
+  const [loading, setLoading] = useState(false);
+
+  const defaultErrors = {
+    passwordsMatch: null,
+  };
+
+  const [errors, setErrors] = useState(defaultErrors);
 
   const navigate = useNavigate();
   const { loginAuth } = useAuthContext();
@@ -25,10 +34,35 @@ export default function SignupPage() {
   };
 
   // Handle form submission (dummy logic)
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    const { password, confirmPassword } = formData;
+    if (password !== confirmPassword) {
+      setErrors((currentErrors) => ({
+        ...currentErrors,
+        passwordsMatch: "Passwords do not match!",
+      }));
+      return;
+    }
     console.log("Signup form submitted:", formData);
     // Add your form submission logic here
+
+    try {
+      setLoading(true);
+      const API = "http://localhost:5000/register";
+      const res = await fetch(API, {
+        method: "POST",
+        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await res.json();
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -43,6 +77,14 @@ export default function SignupPage() {
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Sign Up for MyApp
         </h2>
+        {errors.passwordsMatch && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.passwordsMatch}
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -109,12 +151,35 @@ export default function SignupPage() {
               placeholder="Enter your password"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
-          >
-            Sign Up
-          </button>
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-bold mb-2">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              placeholder="Enter your password"
+            />
+          </div>
+          {loading ? (
+            <button
+              type="submit"
+              disabled={true}
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Processing...
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+            >
+              Sign Up
+            </button>
+          )}
         </form>
         <div className="mt-6 text-center">
           <p className="text-gray-600">
