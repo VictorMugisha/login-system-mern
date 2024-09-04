@@ -18,6 +18,11 @@ export default function SignupPage() {
 
   const defaultErrors = {
     passwordsMatch: null,
+    allFields: null,
+    shortPassword: null,
+    existingUser: null,
+    serverError: null,
+    randomError: null,
   };
 
   const [errors, setErrors] = useState(defaultErrors);
@@ -34,7 +39,24 @@ export default function SignupPage() {
     }));
   };
 
-  // Handle form submission (dummy logic)
+  function handleErrors(status, data) {
+    switch (status) {
+      case 400:
+        return { allFields: data.message };
+      case 401:
+        return { shortPassword: data.message };
+      case 402:
+        return { existingUser: data.message };
+      case 500:
+        return { serverError: data.message };
+      default:
+        return {
+          randomError: "An unexpected error occurred. Please try again.",
+        };
+    }
+  }
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { password, confirmPassword } = formData;
@@ -46,15 +68,28 @@ export default function SignupPage() {
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
       const res = await fetch(`${BASE_API}/register`, {
         method: "POST",
         body: JSON.stringify(formData),
         headers: { "Content-Type": "application/json" },
       });
 
+      const { status } = res;
       const data = await res.json();
+
+      if (status !== 201) {
+        const errorMessages = handleErrors(res.status, data);
+        if (Object.keys(errorMessages).length > 0) {
+          setErrors((currentErrors) => ({
+            ...currentErrors,
+            ...errorMessages,
+          }));
+          return;
+        }
+      }
+
       console.log(data);
     } catch (error) {
       console.log(error);
@@ -81,6 +116,46 @@ export default function SignupPage() {
             aria-live="assertive"
           >
             {errors.passwordsMatch}
+          </div>
+        )}
+        {errors.randomError && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.randomError}
+          </div>
+        )}
+        {errors.existingUser && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.existingUser}
+          </div>
+        )}
+        {errors.serverError && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.serverError}
+          </div>
+        )}
+        {errors.allFields && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.allFields}
+          </div>
+        )}
+        {errors.shortPassword && (
+          <div
+            className="text-red-800 py-2 px-3 text-center w-full bg-red-200 mb-2"
+            aria-live="assertive"
+          >
+            {errors.shortPassword}
           </div>
         )}
         <form onSubmit={handleSubmit}>

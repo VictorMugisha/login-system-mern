@@ -15,7 +15,7 @@ async function registerUser(req, res) {
 
     if (password.length < 6) {
       return res
-        .status(400)
+        .status(401)
         .json({ message: "Password must be at least 6 characters long" });
     }
 
@@ -24,7 +24,7 @@ async function registerUser(req, res) {
     });
     if (existingUser) {
       return res
-        .status(400)
+        .status(402)
         .json({ message: "Username or email already exists" });
     }
 
