@@ -8,6 +8,7 @@ const UserModel = require("./model/userModel.js");
 
 // Controllers
 const { registerUser, loginUser } = require("./controller/usersController.js");
+const { getAllUsers } = require("./controller/protectedController.js");
 
 dotenv.config();
 const app = express();
@@ -31,14 +32,7 @@ app.post("/register", registerUser);
 app.post("/login", loginUser);
 
 // Get list of all users
-app.get("/users", verifyToken, async (req, res) => {
-  try {
-    const users = await UserModel.find();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+app.get("/users", verifyToken, getAllUsers);
 
 // Middleware function to verify JWT token
 function verifyToken(req, res, next) {
