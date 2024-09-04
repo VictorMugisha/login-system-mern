@@ -5,6 +5,7 @@ import SignupPage from "./pages/SignupPage";
 import AuthContextProvider from "./contexts/AuthContext";
 import ProtectedRouteLayout from "./layouts/ProtectedRoutesLayout";
 import Home from "./pages/protected/Home";
+import UsersPage from "./pages/protected/UsersPage";
 
 export default function App() {
   const router = createBrowserRouter([
@@ -28,6 +29,10 @@ export default function App() {
           path: "home",
           element: <Home />,
         },
+        {
+          path: "users",
+          element: <UsersPage />,
+        }
       ],
     },
   ]);

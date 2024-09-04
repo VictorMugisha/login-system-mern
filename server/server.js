@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
+const UserModel = require("./model/userModel.js");
+
 // Controllers
 const { registerUser, loginUser } = require("./controller/usersController.js");
 
@@ -26,6 +28,17 @@ app.post("/register", registerUser);
 
 // Login route handler
 app.post("/login", loginUser);
+
+
+// Get list of all users
+app.get("/users", async (req, res) => {
+  try {
+    const users = await UserModel.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+})
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
