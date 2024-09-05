@@ -3,31 +3,55 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { BASE_API } from "../../config";
 import { useAuthContext } from "../../contexts/useAuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
-  const { token } = useAuthContext();
+  const { token, logout } = useAuthContext();
+  const navigate = useNavigate();
 
-  // Dummy fetch logic to simulate getting users from a database
   useEffect(() => {
-    // Replace this with your actual fetch logic to get users from your backend
     const fetchUsers = async () => {
-      // Simulated user data, replace with actual API call
       try {
         const response = await fetch(`${BASE_API}/users`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
+        const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
+        if (response.status !== 200) {
+          const errorMessage = data.message;
+          console.log(errorMessage)
+          if (errorMessage === "Token has expired!") {
+            console.log(errorMessage)
+            // Try to get another refresh token
+            const refreshTokenResponse = await fetch(
+              `${BASE_API}/refresh-token`,
+              {
+                method: "POST",
+                credentials: "include",
+              }
+            );
+
+            if (!refreshTokenResponse.ok) {
+              logout();
+              navigate("/login");
+            }
+
+            const data = await refreshTokenResponse.json();
+            const accessToken = data.token;
+            localStorage.setItem("authToken", accessToken);
+            console.log("Using refresh token!")
+            location.reload()
+          }
+          return;
         }
 
-        const data = await response.json();
         console.log(data);
+        setUsers(data)
       } catch (error) {
         console.error(error);
       }
@@ -52,7 +76,7 @@ export default function UsersPage() {
     };
 
     fetchUsers();
-  }, [token]);
+  }, [token, logout, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">

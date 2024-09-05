@@ -92,6 +92,7 @@ async function loginUser(req, res) {
 
 // Handle refreshing token
 async function refreshToken(req, res) {
+  console.log(req.cookies)
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
     res
@@ -100,7 +101,7 @@ async function refreshToken(req, res) {
   }
 
   try {
-    const decodedToken = jwt.verify(refreshtoken, JWT_SECRET_REFRESH_KEY);
+    const decodedToken = jwt.verify(refreshToken, JWT_SECRET_REFRESH_KEY);
 
     // Generate a new access token
     const payload = {
