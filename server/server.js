@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const UserModel = require("./model/userModel.js");
 
 // Controllers
-const { registerUser, loginUser } = require("./controller/usersController.js");
+const { registerUser, loginUser, refreshtoken } = require("./controller/usersController.js");
 const { getAllUsers } = require("./controller/protectedController.js");
 
 dotenv.config();
@@ -30,6 +30,9 @@ app.post("/register", registerUser);
 
 // Login route handler
 app.post("/login", loginUser);
+
+// Refresh token
+app.post("/refresh-token", refreshtoken);
 
 // Get list of all users
 app.get("/users", verifyToken, getAllUsers);
