@@ -79,8 +79,8 @@ async function loginUser(req, res) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
-      maxAge: 60*60*60*24
-    })
+      maxAge: 60 * 60 * 60 * 24,
+    });
 
     res
       .status(201)
@@ -90,7 +90,38 @@ async function loginUser(req, res) {
   }
 }
 
+// Handle refreshing token
+async function refreshToken(req, res) {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    res
+      .status(401)
+      .json({ success: false, message: "Refresh token is missing!" });
+  }
+
+  try {
+    const decodedToken = jwt.verify(refreshtoken, JWT_SECRET_REFRESH_KEY);
+
+    // Generate a new access token
+    const payload = {
+      userId: decodedToken.userId,
+      firstName: decodedToken.firstName,
+      lastName: decodedToken.lastName,
+      email: decodedToken.email,
+      username: decodedToken.username,
+    };
+    const newAccessToken = jwt.sign(payload, JWT_SECRET_KEY, {
+      expiresIn: "1m",
+    });
+
+    res.status(200).json({ success: true, token: newAccessToken });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Internal Server Error!" });
+  }
+}
+
 module.exports = {
   registerUser,
   loginUser,
+  refreshToken
 };
