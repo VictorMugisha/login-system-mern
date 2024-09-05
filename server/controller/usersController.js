@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+const JWT_SECRET_REFRESH_KEY = process.env.JWT_SECRET_REFRESH_KEY;
 
 async function registerUser(req, res) {
   try {
@@ -68,7 +69,18 @@ async function loginUser(req, res) {
       username: user.username,
       email: user.email,
     };
-    const token = jwt.sign(payload, JWT_SECRET_KEY);
+    const token = jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: "1m" });
+    const refreshToken = jwt.sign(payload, JWT_SECRET_REFRESH_KEY, {
+      expiresIn: "1d",
+    });
+
+    // Set refresh token on an HTTP-only Cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 60*60*60*24
+    })
 
     res
       .status(201)
